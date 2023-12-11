@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 # importing modules
 import click
 import numpy as np
@@ -5,6 +7,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+from sklearn import preprocessing
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import normalize
 from sklearn.ensemble import RandomForestClassifier
@@ -50,20 +53,25 @@ def grid_search(x_train, y_train, x_test):
     y_pred = rf_model.predict(x_test)
     return y_pred
 
-def encoding_labels(labels):
-    encoder = preprocessing.LabelEncoder()
+def encoding_labels(encoder, labels):
     encoder.fit(labels)
     labels = encoder.transform(labels)
     return labels
 
 @click.command()
-@click.option('--lang', prompt='Language?',
+@click.option('--lang', type=str, prompt='Language?',
               help='it, fr, en.')
-def main():
+def language(lang):
     # load data
-    df = pd.read_csv(f"../data/extracted_data_{lang}.csv")
-    data = pd.read_csv(f"../data/vectorized_data_{lang}.csv")
-    # adding labels to vectorized texts
+    click.echo(f"language is {lang}")
+    return lang
+
+def main():
+    lang = language.main(standalone_mode=False)
+    # load data
+    print('im here')
+    df = pd.read_csv(f"extracted_data_{lang}.csv")
+    data = pd.read_csv(f"vectorized_data_{lang}.csv")
     data['cat_id'] = df['Party']
     # train test split
     train, test = train_test_split(data, test_size=0.2,
@@ -72,6 +80,7 @@ def main():
     x_train, y_train_label = train.loc[:, "0":"19"], train["cat_id"].values.astype(object)
     x_test, y_test_label = test.loc[:, "0":"19"], test["cat_id"].values.astype(object)
     # encoding
+    encoder = preprocessing.LabelEncoder()
     y_train_label = encoding_labels(y_train_label)
     y_test_label = encoding_labels(y_test_label)
     # scaling
@@ -85,4 +94,5 @@ def main():
     # confusion matrix
     conf_matrix(y_test_label, y_pred_label, lang)
 
-main()
+if __name__ == '__main__':
+    main()
