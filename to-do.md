@@ -10,6 +10,13 @@
   - à noter : les listes de `stopwordsiso` ne prennent pas en compte les articles contractés pour le français et l'italien.
   
 **Pour le 02/12 :**
-- [ ] premier modèle sur nos données : arbre de décision !
+- [ x ] premier modèle sur nos données : ~~arbre de décision~~ Random Forest!
   - pour le moment avec nos données vectorisées, on verra + tard si on se charge des clitiques (ça sera mieux pour le français + italien)
-- [ ] avoir bien commencé l'état de l'art (ça sera sur le rendu final)
+- [ x ] avoir bien commencé l'état de l'art (ça sera sur le rendu final)
+
+**Pour le 18/12 :**
+- [ ] terminer modèle Random Forest (on vire GridSearch) => résultats (matrices de confusion + mesures)
+- [ ] trouver des articles pour état de l'art sur la régression logistique
+- [ ] commencer à rédiger état de l'art Random Forest
+
+**Date limite (perso) :** 30/12
