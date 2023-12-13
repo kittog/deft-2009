@@ -15,8 +15,9 @@
 - [x] avoir bien commencé l'état de l'art (ça sera sur le rendu final)
 
 **Pour le 18/12 :**
-- [ ] terminer modèle Random Forest (on vire GridSearch) => résultats (matrices de confusion + mesures)
-- [ ] trouver des articles pour état de l'art sur la régression logistique
-- [ ] commencer à rédiger état de l'art Random Forest
+- [ ] terminer modèle Random Forest (on vire GridSearch) => résultats (matrices de confusion + mesures) (**Léna**)
+- [ ] trouver des articles pour état de l'art sur la régression logistique (**Natacha**)
+- [ ] commencer à rédiger état de l'art Random Forest (**Natacha**)
+- [ ] commencer script régression logistique (**Qinliang**)
 
 **Date limite (perso) :** 30/12
