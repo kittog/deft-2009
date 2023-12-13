@@ -16,14 +16,19 @@ from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_score, GridSearchCV
 
+def clf_report(y_test, y_pred, lang):
+    report = classification_report(y_test, y_pred,output_dict=True)
+    df = pd.DataFrame(report).transpose()
+    df.to_csv(f"classification_report_{lang}.csv")
+
 def conf_matrix(y_test, y_pred, lang):
     labels = ["ELDR", "GUE-NGL", "PPE-DE","PSE","Verts-ALE"]
     ax = plt.subplot()
-    cm = confusion_matrix(y_test_label, y_pred_label)
-    sns.heatmap(cm, annot=True, fmt='g', ax=ax, xticklabels=labels, yticklabels=labels)
+    cm = confusion_matrix(y_test, y_pred)
+    sns.heatmap(cm, annot=True, fmt='g', ax=ax, xticklabels=labels, yticklabels=labels).set_title(f"Confusion matrix for {lang}")
     ax.set_xlabel("Predicted labels")
     ax.set_ylabel("True labels")
-    ax.set_title(f"Confusion Matrix for {lang}")
+    # ax.set_title(f"Confusion Matrix for {lang}")
     plt.savefig(f"conf_matrix_{lang}.png")
 
 
@@ -34,7 +39,7 @@ def grid_search(x_train, y_train, x_test):
     criterion = ["gini"]
     min_samples_leaf = [2, 3]
     bootstrap = [True]
-    max_samples = [500, 1000, 5000, 7000]
+    max_samples = [500, 1000]
 
     param_grid = {
         "n_estimators" : n_estimators,
@@ -67,9 +72,9 @@ def language(lang):
     return lang
 
 def main():
+    dic_l = {"en":"english", "it":"italian", "fr":"french"}
     lang = language.main(standalone_mode=False)
     # load data
-    print('im here')
     df = pd.read_csv(f"extracted_data_{lang}.csv")
     data = pd.read_csv(f"vectorized_data_{lang}.csv")
     data['cat_id'] = df['Party']
@@ -81,18 +86,20 @@ def main():
     x_test, y_test_label = test.loc[:, "0":"19"], test["cat_id"].values.astype(object)
     # encoding
     encoder = preprocessing.LabelEncoder()
-    y_train_label = encoding_labels(y_train_label)
-    y_test_label = encoding_labels(y_test_label)
+    y_train_label = encoding_labels(encoder, y_train_label)
+    y_test_label = encoding_labels(encoder, y_test_label)
     # scaling
     scaler = StandardScaler()
     # standardization of the data
     x_train_scaled = scaler.fit_transform(x_train)
     x_test_scaled = scaler.fit_transform(x_test)
     # gridsearch
-    y_pred = grid_search(x_train_scaled, y_train_label, x_test_scaled)
-    y_pred_label = list(encoder.inverse_transform(y_pred))
+    y_pred = grid_search(x_train_scaled, y_train_label, x_test_scaled) # categorical
+    y_pred_label = list(encoder.inverse_transform(y_pred)) # string
     # confusion matrix
-    conf_matrix(y_test_label, y_pred_label, lang)
+    conf_matrix(y_test_label, y_pred, dic_l[lang])
+    # report
+    clf_report(y_test_label, y_pred, dic_l[lang])
 
 if __name__ == '__main__':
     main()
