@@ -31,8 +31,23 @@ def conf_matrix(y_test, y_pred, lang):
     # ax.set_title(f"Confusion Matrix for {lang}")
     plt.savefig(f"conf_matrix_{lang}.png")
 
+def random_forest(x_train, y_train, x_test):
+    # returns y_pred
+    rf = RandomForestClassifier(random_state=42,
+                        n_estimators=20,
+                        max_depth=15,
+                        criterion="gini",
+                        min_samples_leaf=2,
+                        boostrap=True,
+                        max_samples=500)
+    rf.fit(x_train, y_train)
+    y_pred = rf.predict(x_test)
+    return y_pred
 
+# no need for grid search
 def grid_search(x_train, y_train, x_test):
+    # TODO : rerun in notebook to check which
+    # model would be the most interesting
     # grid search
     n_estimators = [20, 25]
     max_depth = [15, 25, 30]
@@ -88,13 +103,21 @@ def main():
     encoder = preprocessing.LabelEncoder()
     y_train_label = encoding_labels(encoder, y_train_label)
     y_test_label = encoding_labels(encoder, y_test_label)
+
     # scaling
-    scaler = StandardScaler()
+    # scaler = StandardScaler()
     # standardization of the data
-    x_train_scaled = scaler.fit_transform(x_train)
-    x_test_scaled = scaler.fit_transform(x_test)
+    # x_train_scaled = scaler.fit_transform(x_train)
+    # x_test_scaled = scaler.fit_transform(x_test)
+
+    # normalize data
+    x_train_norm = normalize(x_train)
+    x_test_norm = normalize(y_train)
+
     # gridsearch
-    y_pred = grid_search(x_train_scaled, y_train_label, x_test_scaled) # categorical
+    # y_pred = grid_search(x_train_scaled, y_train_label, x_test_scaled) # categorical
+
+    y_pred = random_forest(x_train, y_train, x_test)
     y_pred_label = list(encoder.inverse_transform(y_pred)) # string
     # confusion matrix
     conf_matrix(y_test_label, y_pred, dic_l[lang])
