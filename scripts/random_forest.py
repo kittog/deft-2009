@@ -4,6 +4,7 @@
 import click
 import numpy as np
 import pandas as pd
+import polars as pl
 import seaborn as sns
 import matplotlib.pyplot as plt
 
@@ -23,6 +24,7 @@ def clf_report(y_test, y_pred, lang):
 
 def conf_matrix(y_test, y_pred, lang):
     labels = ["ELDR", "GUE-NGL", "PPE-DE","PSE","Verts-ALE"]
+    plt.figure()
     ax = plt.subplot()
     cm = confusion_matrix(y_test, y_pred)
     sns.heatmap(cm, annot=True, fmt='g', ax=ax, xticklabels=labels, yticklabels=labels).set_title(f"Confusion matrix for {lang}")
@@ -38,7 +40,7 @@ def random_forest(x_train, y_train, x_test):
                         max_depth=15,
                         criterion="gini",
                         min_samples_leaf=2,
-                        boostrap=True,
+                        bootstrap=True,
                         max_samples=500)
     rf.fit(x_train, y_train)
     y_pred = rf.predict(x_test)
@@ -90,9 +92,9 @@ def main():
     dic_l = {"en":"english", "it":"italian", "fr":"french"}
     lang = language.main(standalone_mode=False)
     # load data
-    df = pd.read_csv(f"extracted_data_{lang}.csv")
-    data = pd.read_csv(f"vectorized_data_{lang}.csv")
-    data['cat_id'] = df['Party']
+    df = pd.read_csv(f"data/extracted_data_{lang}.csv")
+    data = pd.read_csv(f"data/vectorized_data_{lang}.csv")
+    data["cat_id"] = df['Party']
     # train test split
     train, test = train_test_split(data, test_size=0.2,
                                    train_size=0.8, shuffle=True)
@@ -112,12 +114,12 @@ def main():
 
     # normalize data
     x_train_norm = normalize(x_train)
-    x_test_norm = normalize(y_train)
+    x_test_norm = normalize(x_test)
 
     # gridsearch
     # y_pred = grid_search(x_train_scaled, y_train_label, x_test_scaled) # categorical
 
-    y_pred = random_forest(x_train, y_train, x_test)
+    y_pred = random_forest(x_train, y_train_label, x_test)
     y_pred_label = list(encoder.inverse_transform(y_pred)) # string
     # confusion matrix
     conf_matrix(y_test_label, y_pred, dic_l[lang])
