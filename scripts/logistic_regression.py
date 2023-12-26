@@ -1,4 +1,3 @@
-
 import click
 import numpy as np
 import pandas as pd
@@ -7,7 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn import preprocessing
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, classification_report
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score
 
 def clf_report(y_test, y_pred, lang):
     report = classification_report(y_test, y_pred, output_dict=True)
@@ -30,6 +29,10 @@ def logistic_regression(x_train, y_train, x_test):
     y_pred = lr.predict(x_test)
     return y_pred
 
+def cross_validate_model(model, X, y):
+    scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+    print(f"Cross-validated Accuracy: {np.mean(scores)}")
+
 @click.command()
 @click.option('--lang', type=str, prompt='Language?', help='it, fr, en.')
 def language(lang):
@@ -51,6 +54,9 @@ def main():
     y_train_label = encoding_labels(encoder, y_train_label)
     y_test_label = encoding_labels(encoder, y_test_label)
 
+    # Cross-validation
+    cross_validate_model(LogisticRegression(random_state=42), data.loc[:, "0":"19"], data["cat_id"].values.astype(object))
+    
     y_pred = logistic_regression(x_train, y_train_label, x_test)
     y_pred_label = list(encoder.inverse_transform(y_pred))
     
