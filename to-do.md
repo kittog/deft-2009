@@ -23,6 +23,7 @@
 **Pour le 29/12 :**
 - [ ] état-de-l'art LR
 - [ ] mise en forme sur template Overleaf
+- [ ] RF cross validation
 - [ ] vectorisation Chen 2021 + LR // + RF
 - [ ] rédaction résultats
 
