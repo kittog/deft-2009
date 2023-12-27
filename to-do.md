@@ -16,8 +16,14 @@
 
 **Pour le 18/12 :**
 - [x] terminer modèle Random Forest (on vire GridSearch) => résultats (matrices de confusion + mesures) (**Léna**)
-- [ ] trouver des articles pour état de l'art sur la régression logistique (**Natacha**)
+- [x] trouver des articles pour état de l'art sur la régression logistique (**Natacha**)
 - [x] commencer à rédiger état de l'art Random Forest (**Natacha**)
-- [ ] commencer script régression logistique (**Qinliang**)
+- [x] ~~commencer~~ script régression logistique (**Qinliang**)
+
+**Pour le 29/12 :**
+- [ ] état-de-l'art LR
+- [ ] mise en forme sur template Overleaf
+- [ ] vectorisation Chen 2021 + LR // + RF
+- [ ] rédaction résultats
 
 **Date limite (perso) :** 30/12
