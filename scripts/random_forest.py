@@ -88,24 +88,30 @@ def language(lang):
     click.echo(f"language is {lang}")
     return lang
 
+def cross_validate_model(model, X, y):
+    scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+    print(f"Cross-validated Accuracy: {np.mean(scores)}")
+
 def main():
     dic_l = {"en":"english", "it":"italian", "fr":"french"}
     lang = language.main(standalone_mode=False)
     # load data
-    df = pd.read_csv(f"data/extracted_data_{lang}.csv")
-    data = pd.read_csv(f"data/vectorized_data_{lang}.csv")
-    data["cat_id"] = df['Party']
-    # train test split
-    train, test = train_test_split(data, test_size=0.2,
-                                   train_size=0.8, shuffle=True)
-    # x, y
-    x_train, y_train_label = train.loc[:, "0":"19"], train["cat_id"].values.astype(object)
-    x_test, y_test_label = test.loc[:, "0":"19"], test["cat_id"].values.astype(object)
-    # encoding
+
+    train_df = pd.read_csv(f"data/train/extracted_data_{lang}.csv")
+    test_df = pd.read_csv(f"data/test/extracted_data_test_{lang}.csv")
+
+    train_data = pd.read_csv(f"data/train/vectorized_data_{lang}.csv")
+    test_data = pd.read_csv(f"data/test/vectorized_data_test_{lang}.csv")
+
+    train_data["cat_id"] = train_df['Party']
+    test_data["cat_id"] = test_df['Parties']
+
+    x_train, y_train_label = train_data.loc[:, "0":"19"], train_data["cat_id"].values.astype(object)
+    x_test, y_test_label = test_data.loc[:, "0":"19"], test_data["cat_id"].values.astype(object)
+
     encoder = preprocessing.LabelEncoder()
     y_train_label = encoding_labels(encoder, y_train_label)
     y_test_label = encoding_labels(encoder, y_test_label)
-
     # scaling
     # scaler = StandardScaler()
     # standardization of the data
@@ -118,6 +124,7 @@ def main():
 
     # gridsearch
     # y_pred = grid_search(x_train_scaled, y_train_label, x_test_scaled) # categorical
+    cross_validate_model(RandomForestClassifier(random_state=42), x_train, y_train_label)
 
     y_pred = random_forest(x_train, y_train_label, x_test)
     y_pred_label = list(encoder.inverse_transform(y_pred)) # string

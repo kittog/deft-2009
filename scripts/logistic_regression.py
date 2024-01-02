@@ -42,26 +42,31 @@ def language(lang):
 def main():
     dic_l = {"en": "english", "it": "italian", "fr": "french"}
     lang = language.main(standalone_mode=False)
-    df = pd.read_csv(f"data/extracted_data_{lang}.csv")
-    data = pd.read_csv(f"data/vectorized_data_{lang}.csv")
-    data["cat_id"] = df['Party']
-    
-    train, test = train_test_split(data, test_size=0.2, train_size=0.8, shuffle=True)
-    x_train, y_train_label = train.loc[:, "0":"19"], train["cat_id"].values.astype(object)
-    x_test, y_test_label = test.loc[:, "0":"19"], test["cat_id"].values.astype(object)
-    
+
+    train_df = pd.read_csv(f"data/train/extracted_data_{lang}.csv")
+    test_df = pd.read_csv(f"data/test/extracted_data_test_{lang}.csv")
+
+    train_data = pd.read_csv(f"data/train/vectorized_data_{lang}.csv")
+    test_data = pd.read_csv(f"data/test/vectorized_data_test_{lang}.csv")
+
+    train_data["cat_id"] = train_df['Party']
+    test_data["cat_id"] = test_df['Parties']
+
+    x_train, y_train_label = train_data.loc[:, "0":"19"], train_data["cat_id"].values.astype(object)
+    x_test, y_test_label = test_data.loc[:, "0":"19"], test_data["cat_id"].values.astype(object)
+
     encoder = preprocessing.LabelEncoder()
     y_train_label = encoding_labels(encoder, y_train_label)
     y_test_label = encoding_labels(encoder, y_test_label)
 
-    # Cross-validation
-    cross_validate_model(LogisticRegression(random_state=42), data.loc[:, "0":"19"], data["cat_id"].values.astype(object))
-    
+    cross_validate_model(LogisticRegression(random_state=42), x_train, y_train_label)
+
     y_pred = logistic_regression(x_train, y_train_label, x_test)
     y_pred_label = list(encoder.inverse_transform(y_pred))
-    
+
     conf_matrix(y_test_label, y_pred, dic_l[lang])
     clf_report(y_test_label, y_pred, dic_l[lang])
+
 
 def encoding_labels(encoder, labels):
     encoder.fit(labels)
