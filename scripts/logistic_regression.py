@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn import preprocessing
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, classification_report
-from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.model_selection import cross_val_predict, StratifiedKFold
 
 def clf_report(y_test, y_pred, lang):
     report = classification_report(y_test, y_pred, output_dict=True)
@@ -23,15 +23,16 @@ def conf_matrix(y_test, y_pred, lang):
     ax.set_ylabel("True labels")
     plt.savefig(f"conf_matrix_{lang}.png")
 
-def logistic_regression(x_train, y_train, x_test):
-    lr = LogisticRegression(random_state=42)
+def logistic_regression(x_train, y_train, x_test, C=3.0, solver='lbfgs', max_iter=200, penalty='l2', tol=1e-4):
+    lr = LogisticRegression(C=C, solver=solver, max_iter=max_iter, random_state=42, penalty=penalty, tol=tol)
     lr.fit(x_train, y_train)
     y_pred = lr.predict(x_test)
     return y_pred
 
-def cross_validate_model(model, X, y):
-    scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
-    print(f"Cross-validated Accuracy: {np.mean(scores)}")
+def kfold_cross_validate_model(model, X, y, n_splits=5):
+    skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
+    y_pred = cross_val_predict(model, X, y, cv=skf)
+    return y_pred
 
 @click.command()
 @click.option('--lang', type=str, prompt='Language?', help='it, fr, en.')
@@ -54,19 +55,15 @@ def main():
 
     x_train, y_train_label = train_data.loc[:, "0":"19"], train_data["cat_id"].values.astype(object)
     x_test, y_test_label = test_data.loc[:, "0":"19"], test_data["cat_id"].values.astype(object)
-
+    print(set(y_test_label))
     encoder = preprocessing.LabelEncoder()
     y_train_label = encoding_labels(encoder, y_train_label)
     y_test_label = encoding_labels(encoder, y_test_label)
 
-    cross_validate_model(LogisticRegression(random_state=42), x_train, y_train_label)
+    y_pred = kfold_cross_validate_model(LogisticRegression(random_state=42, C=1.0, solver='liblinear', max_iter=100, penalty='l1', tol=1e-3), x_train, y_train_label, n_splits=5)
 
-    y_pred = logistic_regression(x_train, y_train_label, x_test)
-    y_pred_label = list(encoder.inverse_transform(y_pred))
-
-    conf_matrix(y_test_label, y_pred, dic_l[lang])
-    clf_report(y_test_label, y_pred, dic_l[lang])
-
+    conf_matrix(y_train_label, y_pred, dic_l[lang])
+    clf_report(y_train_label, y_pred, dic_l[lang])
 
 def encoding_labels(encoder, labels):
     encoder.fit(labels)
