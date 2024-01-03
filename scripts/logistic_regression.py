@@ -60,7 +60,7 @@ def main():
     y_train_label = encoding_labels(encoder, y_train_label)
     y_test_label = encoding_labels(encoder, y_test_label)
 
-    y_pred = kfold_cross_validate_model(LogisticRegression(random_state=42), x_train, y_train_label, n_splits=5)
+    y_pred = kfold_cross_validate_model(LogisticRegression(random_state=42, C=1.0, solver='liblinear', max_iter=100, penalty='l1', tol=1e-3), x_train, y_train_label, n_splits=5)
 
     conf_matrix(y_train_label, y_pred, dic_l[lang])
     clf_report(y_train_label, y_pred, dic_l[lang])
