@@ -23,7 +23,7 @@ def conf_matrix(y_test, y_pred, lang):
     ax.set_ylabel("True labels")
     plt.savefig(f"conf_matrix_{lang}.png")
 
-def logistic_regression(x_train, y_train, x_test, C=3.0, solver='lbfgs', max_iter=200, penalty='l2', tol=1e-4):
+def logistic_regression(x_train, y_train, x_test, C=3.0, solver='saga', max_iter=200, penalty='l2', tol=1e-4):
     lr = LogisticRegression(C=C, solver=solver, max_iter=max_iter, random_state=42, penalty=penalty, tol=tol)
     lr.fit(x_train, y_train)
     y_pred = lr.predict(x_test)
