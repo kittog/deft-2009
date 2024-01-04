@@ -32,7 +32,7 @@ def tokenize_and_filter(texts, lang):
     return filtered_docs
 
 
-def vectorize(input_xml, output_csv, output_tfidf_csv, lang, n_components=20):
+def process_xml(input_xml, output_csv, output_tfidf_csv, lang, n_components=20):
     tree = ET.parse(input_xml)
     # texts = []
     texts, parties = [], []
