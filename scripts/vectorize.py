@@ -19,7 +19,7 @@ def tokenize_and_filter(texts, lang):
     for text in tqdm(texts):
         doc = nlp(text)
         # tokenize
-        tokens = [token.text for token in doc]
+        tokens = [word.lemma_ for word in doc]
         filtered_tokens = []
         # filter out raw punctuation, numbers etc
         for token in tokens:
@@ -32,25 +32,23 @@ def tokenize_and_filter(texts, lang):
     return filtered_docs
 
 
-def process_xml(input_xml, output_csv, output_tfidf_csv, lang, input_parties, n_components=20):
+def process_xml(input_xml, output_csv, output_tfidf_csv, lang, n_components=20):
     tree = ET.parse(input_xml)
-    texts = []
-    # texts, parties = [], []
+    # texts = []
+    texts, parties = [], []
 
     for doc in tree.findall('.//doc'):
         text = ' '.join(p.text for p in doc.findall('.//texte//p') if p.text)
-        # party_value = doc.find('.//EVAL_PARTI/PARTI').get('valeur') if doc.find('.//EVAL_PARTI') else None
+        party_value = doc.find('.//EVAL_PARTI/PARTI').get('valeur') if doc.find('.//EVAL_PARTI') else None
 
-        if text:
+
+        if text and party_value:
             texts.append(text)
+            parties.append(party_value)
 
-        #if text and party_value:
-        #    texts.append(text)
-        #    parties.append(party_value)
-
-    # df = pd.DataFrame({'Text': texts, 'Party': parties})
-    df = pd.DataFrame({'Text':texts})
-    df['Parties'] = input_parties # series
+    df = pd.DataFrame({'Text': texts, 'Party': parties})
+    # df = pd.DataFrame({'Text':texts})
+    # df['Parties'] = input_parties # series
     df['Clean'] = tokenize_and_filter(texts, lang)
     df.to_csv(output_csv, index=False)
 
@@ -66,10 +64,10 @@ def process_all_languages():
     languages = ['en', 'fr', 'it']
 
     for lang in languages:
-        input_xml = f'deft09/Corpus de test/deft09_parlement_test_{lang}.xml'
-        input_txt = f'deft09/Données de référence/deft09_parlement_ref_{lang}.txt'
-        df_parties = pd.read_csv(input_txt, sep='\t', names=['id', 'parties'])
-        process_xml(input_xml, f'extracted_data_test_{lang}.csv', f'vectorized_data_test_{lang}.csv', lang, df_parties['parties'])
+        input_xml = f'deft09/Corpus d_apprentissage/deft09_parlement_appr_{lang}.xml'
+        # input_txt = f'deft09/Données de référence/deft09_parlement_ref_{lang}.txt'
+        # df_parties = pd.read_csv(input_txt, sep='\t', names=['id', 'parties'])
+        process_xml(input_xml, f'extracted_data_train_lemma_{lang}.csv', f'vectorized_data_train_{lang}.csv', lang)
 
 
 process_all_languages()
