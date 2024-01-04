@@ -16,6 +16,8 @@ from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_score, GridSearchCV
+from sklearn.model_selection import cross_val_predict, StratifiedKFold
+from sklearn.linear_model import SGDClassifier
 
 def clf_report(y_test, y_pred, lang):
     report = classification_report(y_test, y_pred,output_dict=True)
@@ -32,6 +34,11 @@ def conf_matrix(y_test, y_pred, lang):
     ax.set_ylabel("True labels")
     # ax.set_title(f"Confusion Matrix for {lang}")
     plt.savefig(f"conf_matrix_{lang}.png")
+
+def kfold_cross_validate_model(model, X, y, n_splits=5):
+    skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
+    y_pred = cross_val_predict(model, X, y, cv=skf)
+    return y_pred
 
 def random_forest(x_train, y_train, x_test):
     # returns y_pred
@@ -122,16 +129,21 @@ def main():
     x_train_norm = normalize(x_train)
     x_test_norm = normalize(x_test)
 
+    y_pred = kfold_cross_validate_model(SGDClassifier(max_iter=1000, tol=1e-3, random_state=43), x_train, y_train_label, n_splits=5)
+
+    conf_matrix(y_train_label, y_pred, dic_l[lang])
+    clf_report(y_train_label, y_pred, dic_l[lang])
     # gridsearch
     # y_pred = grid_search(x_train_scaled, y_train_label, x_test_scaled) # categorical
-    cross_validate_model(RandomForestClassifier(random_state=42), x_train, y_train_label)
+    # cross_validate_model(RandomForestClassifier(random_state=42), x_train, y_train_label)
 
-    y_pred = random_forest(x_train, y_train_label, x_test)
-    y_pred_label = list(encoder.inverse_transform(y_pred)) # string
+    # y_pred = random_forest(x_train, y_train_label, x_test)
+
+    # y_pred_label = list(encoder.inverse_transform(y_pred)) # string
     # confusion matrix
-    conf_matrix(y_test_label, y_pred, dic_l[lang])
+    # conf_matrix(y_test_label, y_pred, dic_l[lang])
     # report
-    clf_report(y_test_label, y_pred, dic_l[lang])
+    # clf_report(y_test_label, y_pred, dic_l[lang])
 
 if __name__ == '__main__':
     main()
