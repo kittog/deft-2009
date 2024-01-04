@@ -19,10 +19,10 @@ def process_all_languages():
     languages = ['en', 'fr', 'it']
 
     for lang in languages:
-        input_csv = f'data/ausecours/extracted_data_train_lemma_{lang}.csv'
+        input_csv = f'data/ausecours/extracted_data_test_lemma_{lang}.csv'
         # input_txt = f'deft09/Données de référence/deft09_parlement_ref_{lang}.txt'
         # df_parties = pd.read_csv(input_txt, sep='\t', names=['id', 'parties'])
-        process_xml(input_csv, f'data/ausecours/vectorized_data_train_cvect_{lang}.csv', lang)
+        process_xml(input_csv, f'data/ausecours/vectorized_data_test_cvect_{lang}.csv', lang)
 
 
 process_all_languages()
