@@ -12,11 +12,11 @@ import math
 import os
 import glob
 
-
 from  collections import  Counter
 
 conceptfreq = {}
-txts = glob.glob("data/extracted_data_*.csv")
+path = "data/txt/en"
+txts = glob.glob(path + "/*.txt")
 
 # files = ['42','20','45','41','36','30','16','44','34','1','26','5','9','21','73','69','24','7','11','10','8','31','40','18','38','75','13','71','56','6','67','19','52','28','22','14','65','12','33','68','39','15','25','78','43','4','51','62','29','66']
 
@@ -27,7 +27,7 @@ def getTerms (): #file
     rtlist = []
     tplist = []
     for txt in txts:
-            f_r = open(path + '/' + txt, 'r')
+            f_r = open(txt, 'r')
             words = f_r.read()
             if  len(words)> 0:
                 wordlist = words.strip().split(" ")
@@ -50,7 +50,7 @@ def getDomainFrequency (strfile):
     tplist = []
     for txt in txts:
         if txt.split('_')[0] == strfile:
-            f_r = open(path+'/'+txt,'r')
+            f_r = open(txt,'r')
             words = f_r.read()
             if len(words) > 0:
                 wordlist = words.strip().split(' ')
@@ -67,7 +67,7 @@ def getMinandMaxFre(filename):
     for nu in numlist:
         if conceptfreq[filename][nu] > 0:  # if term exists in the file
             nummanxin = nummaxout = 0
-            for file in files:
+            for file in txts:
                 if file == filename:                   # get the frequency of terms in the corresponding domain corpus
                     nummanxin = conceptfreq[file][nu]
                 else:
@@ -105,7 +105,7 @@ def getTermsdc(filename):
             for txt in txts:
                 if txt.split('_')[0] == filename:
 
-                    f_tx = open(path+"/"+txt,'r')
+                    f_tx = open(txt,'r')
                     words = f_tx.read().split(' ')
                     termfre = Counter(words)[nu]
                     termMaxfre = max(Counter(words).values())
@@ -120,7 +120,7 @@ def getTermsdc(filename):
 if __name__ == '__main__':
 
     # get the potential domain concepts from the corpus, the results as the following
-    f_w = open('tempdata/fifty_newpotentialconcepts_weights.txt', 'w')
+    f_w = open('fifty_newpotentialconcepts_weights.txt', 'w')
 
     # get the potential terms in the legal domain
     numlist = getTerms()
@@ -129,11 +129,11 @@ if __name__ == '__main__':
 
     # compute the frequency of terms in or out in correponding domain
 
-    for file in files:
+    for file in txts:
         conceptfreq[file] = getDomainFrequency(file)
 
     # compute the dp and dc of each domain
-    for file in files:
+    for file in txts:
         # get the domain concepts candidates from the specific domain
         # get the frequency of nouns in this domain
         sum = {}
