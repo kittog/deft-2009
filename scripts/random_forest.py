@@ -101,24 +101,25 @@ def cross_validate_model(model, X, y):
 
 def main():
     dic_l = {"en":"english", "it":"italian", "fr":"french"}
-    lang = language.main(standalone_mode=False)
+    # lang = language.main(standalone_mode=False)
     # load data
 
-    train_df = pd.read_csv(f"data/train/extracted_data_{lang}.csv")
-    test_df = pd.read_csv(f"data/test/extracted_data_test_{lang}.csv")
+    # train_df = pd.read_csv(f"data/train/extracted_data_{lang}.csv")
+    # test_df = pd.read_csv(f"data/test/extracted_data_test_{lang}.csv")
 
-    train_data = pd.read_csv(f"data/train/vectorized_data_{lang}.csv")
-    test_data = pd.read_csv(f"data/test/vectorized_data_test_{lang}.csv")
+    # train_data = pd.read_csv(f"data/train/vectorized_data_{lang}.csv")
+    # test_data = pd.read_csv(f"data/test/vectorized_data_test_{lang}.csv")
 
-    train_data["cat_id"] = train_df['Party']
-    test_data["cat_id"] = test_df['Parties']
+    # train_data["cat_id"] = train_df['Party']
+    # test_data["cat_id"] = test_df['Parties']
 
-    x_train, y_train_label = train_data.loc[:, "0":"19"], train_data["cat_id"].values.astype(object)
-    x_test, y_test_label = test_data.loc[:, "0":"19"], test_data["cat_id"].values.astype(object)
+    train_data = pd.read_csv("data/train/multilingual_corpora.csv")
+    x_train, y_train_label = train_data.loc[:, "0":"19"], train_data["Party"].values.astype(object)
+    # x_test, y_test_label = test_data.loc[:, "0":"19"], test_data["cat_id"].values.astype(object)
 
     encoder = preprocessing.LabelEncoder()
     y_train_label = encoding_labels(encoder, y_train_label)
-    y_test_label = encoding_labels(encoder, y_test_label)
+    # y_test_label = encoding_labels(encoder, y_test_label)
     # scaling
     # scaler = StandardScaler()
     # standardization of the data
@@ -127,12 +128,19 @@ def main():
 
     # normalize data
     x_train_norm = normalize(x_train)
-    x_test_norm = normalize(x_test)
+    # x_test_norm = normalize(x_test)
 
-    y_pred = kfold_cross_validate_model(SGDClassifier(max_iter=1000, tol=1e-3, random_state=43), x_train, y_train_label, n_splits=5)
+    y_pred = kfold_cross_validate_model(RandomForestClassifier(random_state=42,
+                        n_estimators=20,
+                        max_depth=15,
+                        criterion="gini",
+                        min_samples_leaf=2,
+                        bootstrap=True,
+                        max_samples=500), x_train, y_train_label, n_splits=5)
 
-    conf_matrix(y_train_label, y_pred, dic_l[lang])
-    clf_report(y_train_label, y_pred, dic_l[lang])
+    conf_matrix(y_train_label, y_pred, "multi")
+    clf_report(y_train_label, y_pred, "multi")
+
     # gridsearch
     # y_pred = grid_search(x_train_scaled, y_train_label, x_test_scaled) # categorical
     # cross_validate_model(RandomForestClassifier(random_state=42), x_train, y_train_label)
