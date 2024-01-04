@@ -32,7 +32,7 @@ def tokenize_and_filter(texts, lang):
     return filtered_docs
 
 
-def process_xml(input_xml, output_csv, output_tfidf_csv, lang, n_components=20):
+def vectorize(input_xml, output_csv, output_tfidf_csv, lang, n_components=20):
     tree = ET.parse(input_xml)
     # texts = []
     texts, parties = [], []
@@ -67,7 +67,7 @@ def process_all_languages():
         input_xml = f'deft09/Corpus d_apprentissage/deft09_parlement_appr_{lang}.xml'
         # input_txt = f'deft09/Données de référence/deft09_parlement_ref_{lang}.txt'
         # df_parties = pd.read_csv(input_txt, sep='\t', names=['id', 'parties'])
-        process_xml(input_xml, f'extracted_data_train_lemma_{lang}.csv', f'vectorized_data_train_tfidf_{lang}.csv', lang)
+        process_xml(input_xml, f'ausecours/extracted_data_train_lemma_{lang}.csv', f'vectorized_data_train_tfidf_{lang}.csv', lang)
 
 
 process_all_languages()
