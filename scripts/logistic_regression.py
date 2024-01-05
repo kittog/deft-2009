@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn import preprocessing
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, classification_report
-from sklearn.model_selection import cross_val_predict, StratifiedKFold
+from sklearn.model_selection import cross_val_predict, StratifiedKFold, GridSearchCV
 
 def clf_report(y_test, y_pred, lang):
     report = classification_report(y_test, y_pred, output_dict=True)
@@ -34,6 +34,24 @@ def kfold_cross_validate_model(model, X, y, n_splits=5):
     y_pred = cross_val_predict(model, X, y, cv=skf)
     return y_pred
 
+def grid_search_logistic_regression(x_train, y_train_label):
+    param_grid = {
+        'C': [0.001, 0.01, 0.1, 1, 10, 100],
+        'penalty': ['l1', 'l2'],
+        'solver': ['liblinear', 'saga'],
+        'max_iter': [100, 200, 300],
+        'tol': [1e-4, 1e-3, 1e-2]
+    }
+
+    lr = LogisticRegression(random_state=42)
+
+    grid_search = GridSearchCV(lr, param_grid, cv=5, scoring='accuracy')
+    grid_search.fit(x_train, y_train_label)
+
+    print("Meilleurs hyperparamètres:", grid_search.best_params_)
+
+    return grid_search.best_estimator_
+
 @click.command()
 @click.option('--lang', type=str, prompt='Language?', help='it, fr, en.')
 def language(lang):
@@ -60,7 +78,9 @@ def main():
     y_train_label = encoding_labels(encoder, y_train_label)
     y_test_label = encoding_labels(encoder, y_test_label)
 
-    y_pred = kfold_cross_validate_model(LogisticRegression(random_state=42, C=1.0, solver='liblinear', max_iter=100, penalty='l1', tol=1e-3), x_train, y_train_label, n_splits=5)
+    best_lr_model = grid_search_logistic_regression(x_train, y_train_label)
+
+    y_pred = kfold_cross_validate_model(best_lr_model, x_train, y_train_label, n_splits=5)
 
     conf_matrix(y_train_label, y_pred, dic_l[lang])
     clf_report(y_train_label, y_pred, dic_l[lang])
