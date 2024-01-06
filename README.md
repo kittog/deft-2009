@@ -5,7 +5,7 @@ Dépôt pour le projet final réalisé au sein du cours "Apprentissage automatiq
 
 Les consignes du projet sont à retrouver [ici](https://loicgrobol.github.io/apprentissage-artificiel/#2023-10-25--r%C3%A9gularisation). Date limite de rendu : **6 janvier 2024**.
 
-Vous trouverez au sein de ce dêpot : 
+Vous trouverez au sein de ce dépôt : 
 - dans data/ Nos corpus train et test après export et traitement.
 - dans deft09/ le corpus donnée dans la consigne.
 - dans result/ deux dossiers : l'un qui contient les résultat de l'ancienne méthode , l'autre de la nouvelle méthode avec un noteboot comprenant les matrices de confusion et la rapport de classification.
