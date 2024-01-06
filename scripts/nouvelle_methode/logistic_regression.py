@@ -25,7 +25,7 @@ X_train_tfidf = tfidf_vectorizer.fit_transform(X_train)
 X_test_tfidf = tfidf_vectorizer.transform(X_test)
 
 # validation croisée
-model = LogisticRegression(max_iter=5000, multi_class='multinomial', solver='saga', penalty="l2",C=1,tol=1e-3)
+model = LogisticRegression(max_iter=5000, multi_class='multinomial', solver='saga', penalty="l2",C=10,tol=1e-3)
 kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 cross_val_scores = cross_val_score(model, X_train_tfidf, y_train, cv=kf, scoring='accuracy')
 
